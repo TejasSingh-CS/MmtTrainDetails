@@ -1,39 +1,74 @@
-import { test, chromium } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { TrainsPage } from '../pages/TrainsPage';
+import { test, chromium, expect } from '@playwright/test';
 import fs from 'fs';
 import { generateHTMLTable } from '../utils/htmlUtils';
+import { selectTravelDate, selectStation, grabCity } from '../utils/trainUtils';
 
-test('Open MakeMyTrip and fetch train details', async () => {
-  const browser = await chromium.launch({ headless: false });
-  const context = await browser.newContext();
-  const page = await context.newPage();
+test('Open MakeMyTrip', async () => {
+    test.setTimeout(60000); // Increase timeout to 60s
+    const browser = await chromium.launch({ headless: false, args: ['--ignore-certificate-errors'] });
+    const context = await browser.newContext({
+        ignoreHTTPSErrors: true,
+    });
 
-  const homePage = new HomePage(page);
-  const trainsPage = new TrainsPage(page);
+    const page = await context.newPage();
 
-  await homePage.navigateTo();
-  await homePage.closeModalIfPresent();
+    await page.goto('https://www.makemytrip.com/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
 
-  await homePage.openTrainsSection();
-  
-  // Select stations and date
-  await trainsPage.selectStations("ST", "BRC");
-  await trainsPage.selectTravelDate("Thu Mar 27");
+    // Close modal if present
+    const closeButton = page.locator("//span[@class='commonModal__close']");
+    if (await closeButton.isVisible()) await closeButton.dblclick();
 
-  // Click search
-  await trainsPage.searchTrains();
+    await page.locator("//li[@class='menu_Trains']//span[@data-cy='item-wrapper']").click();
+    await page.waitForTimeout(2000);
 
-  // Verify cities
-  await trainsPage.verifyCities("fromCity", "toCity");
+    // Select station 
+    await selectStation(page, "From", "ST");
+    await selectStation(page, "To", "BRC");
 
-  // Fetch train details
-  const trainData = await trainsPage.grabTrainDetails();
+    // Select travel date
+    await selectTravelDate(page, "Thu Mar 27");
+    await page.waitForTimeout(1000);
 
-  // Generate and save HTML
-  const htmlContent = generateHTMLTable(trainData);
-  fs.writeFileSync('train_details.html', htmlContent);
-  console.log('Train details saved in train_details.html');
+    // Click Search
+    await page.locator("//a[@data-cy='submit']").dblclick();
+    
+    await grabCity(page, "fromCity", "From");
+    await grabCity(page, "toCity", "To");
 
-  await browser.close();
+    // Extract train details
+    const trainNameSelectors = page.locator("//p[@data-testid='train-name']");
+    const trainNumberSelectors = page.locator("//p[@data-testid='listing-train-number']");
+    const departureSelectors = page.locator("//p[@data-testid='departure-city']");
+    const arrivalSelectors = page.locator("//p[@data-testid='arrival-city']");
+    const timeSelectors = page.locator("//p[@class='appendBottom8']/span[@class='ListingCard_timeText__VVsOS ListingCard_latoBlack__g7ftF']");
+
+    const trainCount = await trainNameSelectors.count();
+    
+    const trainData: {
+        name: string | null;
+        number: string | null;
+        departure: string | null;
+        arrival: string | null;
+        departureTime: string | null;
+        arrivalTime: string | null;
+    }[] = [];
+
+    for (let i = 0; i < trainCount; i++) {
+        trainData.push({
+            name: await trainNameSelectors.nth(i).textContent(),
+            number: await trainNumberSelectors.nth(i).textContent(),
+            departure: await departureSelectors.nth(i).textContent(),
+            arrival: await arrivalSelectors.nth(i).textContent(),
+            departureTime: (await timeSelectors.nth(i * 2).textContent())?.replace(',', '').trim() ?? null,
+            arrivalTime: (await timeSelectors.nth(i * 2 + 1).textContent())?.replace(',', '').trim() ?? null
+        });
+    }
+    console.log(trainData);
+    await browser.close();
+
+    // Generate and save the HTML table
+    const htmlContent = generateHTMLTable(trainData);
+    fs.writeFileSync('train_details.html', htmlContent);
+    console.log('Train details saved in train_details.html');
 });

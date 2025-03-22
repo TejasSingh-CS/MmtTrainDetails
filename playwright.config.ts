@@ -29,7 +29,7 @@ export default defineConfig({
     // baseURL: 'http://127.0.0.1:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    navigationTimeout: 30000, // Page navigation timeout
+    //navigationTimeout: 30000, // Page navigation timeout
     trace: 'on-first-retry',
   },
 
@@ -40,9 +40,9 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         //viewport: {width:1500, height:720 },
-        screenshot: 'on',
+        //screenshot: 'on',
         //screenshot: 'only-on-failure',
-        trace: 'on',
+        //trace: 'on',
         //video: 'on'
       },
     },
