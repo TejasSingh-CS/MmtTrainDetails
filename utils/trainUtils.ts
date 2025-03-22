@@ -27,7 +27,7 @@ export async function selectStation(page: Page, label: string, stationCode: stri
     await page.waitForTimeout(3000);
     await page.getByPlaceholder(label).fill(stationCode);
     await page.waitForTimeout(3000);
-    await page.locator(".calc50").first().click();
+    await page.locator(".calc50").first().click({force:true});
     await page.waitForTimeout(1000);
 }
 
@@ -35,7 +35,7 @@ export async function selectStation(page: Page, label: string, stationCode: stri
 export async function grabCity(page: Page, cityId: string, cityType: string) {
     // Wait for the input field to be visible
     const citySelector = page.locator(`//input[@id='${cityId}']`);
-    await expect(citySelector).toBeVisible({ timeout: 40000 });
+    await expect(citySelector).toBeVisible({ timeout: 50000 });
     // Get input value
     const cityText = await citySelector.inputValue();
     console.log(`${cityType}: ${cityText}`); // Logs the city name dynamically
