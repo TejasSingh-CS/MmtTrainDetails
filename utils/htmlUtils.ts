@@ -19,16 +19,71 @@ export function generateHTMLTable(
     trainData: TrainDetails[],
     fromCity: string,
     toCity: string,
-    travelDate: string) {
+    travelDate: string
+) {
     let tableContent = `
         <html>
         <head>
-            <title>Train Details from ${fromCity} to ${toCity} & ${travelDate}</title>
+            <title>Train Details from ${fromCity} to ${toCity} - ${travelDate}</title>
             <style>
-                table { border-collapse: collapse; width: 100%; }
-                th, td { border: 1px solid black; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
-                .class-group { margin: 4px 0; padding: 4px; background: #f8f8f8; }
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f7f6;
+                    color: #333;
+                    text-align: center;
+                    padding: 20px;
+                }
+                h2 {
+                    color: #2c3e50;
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                }
+                table {
+                    width: 90%;
+                    margin: auto;
+                    border-collapse: collapse;
+                    background: white;
+                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                th, td {
+                    padding: 12px;
+                    text-align: center;
+                    border-bottom: 1px solid #ddd;
+                }
+                th {
+                    background: #34495e;
+                    color: white;
+                    font-weight: bold;
+                }
+                tr:nth-child(even) {
+                    background: #f8f8f8;
+                }
+                tr:hover {
+                    background: #ecf0f1;
+                    cursor: pointer;
+                }
+                .class-group {
+                    display: inline-block;
+                    padding: 6px 10px;
+                    margin: 3px;
+                    border-radius: 4px;
+                    background: #dff9fb;
+                    color: #0984e3;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                .availability {
+                    display: inline-block;
+                    padding: 6px 10px;
+                    margin: 3px;
+                    border-radius: 4px;
+                    background: #f1c40f;
+                    color: #fff;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
             </style>
         </head>
         <body>
@@ -48,13 +103,12 @@ export function generateHTMLTable(
     `;
 
     trainData.forEach((train, index) => {
-        // Combine classes into single cell content
         const classTypes = train.classes.map(c => 
-            `<div class="class-group">${c.classType}</div>`
+            `<span class="class-group">${c.classType}</span>`
         ).join('');
 
         const availability = train.classes.map(c => 
-            `<div class="class-group">${c.availability}</div>`
+            `<span class="availability">${c.availability}</span>`
         ).join('');
 
         tableContent += `
