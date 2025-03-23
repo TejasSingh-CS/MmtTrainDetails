@@ -1,3 +1,5 @@
+import credentials from '../utils/credentials.json';
+
 export interface ClassDetails {
     classType: string;
     availability: string;
@@ -13,11 +15,15 @@ export interface TrainDetails {
     classes: ClassDetails[];
 }
 
-export function generateHTMLTable(trainData: TrainDetails[]) {
+export function generateHTMLTable(
+    trainData: TrainDetails[],
+    fromCity: string,
+    toCity: string,
+    travelDate: string) {
     let tableContent = `
         <html>
         <head>
-            <title>Train Details</title>
+            <title>Train Details from ${fromCity} to ${toCity} & ${travelDate}</title>
             <style>
                 table { border-collapse: collapse; width: 100%; }
                 th, td { border: 1px solid black; padding: 8px; text-align: left; }
@@ -26,7 +32,7 @@ export function generateHTMLTable(trainData: TrainDetails[]) {
             </style>
         </head>
         <body>
-            <h2>Train Details</h2>
+            <h2>Train Details from ${fromCity} to ${toCity} - ${travelDate}</h2>
             <table>
                 <tr>
                     <th>#</th>

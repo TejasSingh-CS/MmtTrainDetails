@@ -1,22 +1,10 @@
 import { test, chromium, expect } from '@playwright/test';
 import fs from 'fs';
-import { generateHTMLTable } from '../utils/htmlUtils';
+import { Page } from '@playwright/test';
+import { generateHTMLTable, TrainDetails, ClassDetails } from '../utils/htmlUtils'
 import { selectTravelDate, selectStation, grabCity } from '../utils/trainUtils';
-
-interface ClassDetails {
-    classType: string;
-    availability: string;
-}
-
-interface TrainDetails {
-    name: string | null;
-    number: string | null;
-    departure: string | null;
-    arrival: string | null;
-    departureTime: string | null;
-    arrivalTime: string | null;
-    classes: ClassDetails[];
-}
+import credentials from '../utils/credentials.json';
+//const testData = JSON.parse(JSON.stringify(require('../../utils/credentials.json')));
 
 test('Open MakeMyTrip', async () => {
     test.setTimeout(60000);
@@ -33,18 +21,26 @@ test('Open MakeMyTrip', async () => {
     await page.locator("//li[@class='menu_Trains']//span[@data-cy='item-wrapper']").click();
     await page.waitForTimeout(2000);
 
-    await selectStation(page, "From", "ST");
-    await selectStation(page, "To", "BRC");
-    await selectTravelDate(page, "Thu Mar 27");
+    //Select From, To & Travel Date
+    await selectStation(page, "From", credentials.From);
+    await selectStation(page, "To", credentials.To);
+    await selectTravelDate(page, credentials.Date);
     await page.waitForTimeout(1000);
 
+    //Submit Button
     await page.locator("//a[@data-cy='submit']").dblclick();
+
+    //Fetch From, To & Travel Date Information
+    const fromCity = await grabCity(page, "fromCity", "From");
+    const toCity = await grabCity(page, "toCity", "To");
+    const formattedDate = credentials.Date;
     await grabCity(page, "fromCity", "From");
     await grabCity(page, "toCity", "To");
 
+    //List of Train Cards
     const trainCards = await page.locator("[data-testid='listing-card']");
     const trainCount = await trainCards.count();
-
+    
     const trainData: TrainDetails[] = [];
 
     for (let i = 0; i < trainCount; i++) {
@@ -64,7 +60,6 @@ test('Open MakeMyTrip', async () => {
         const classCount = await classCards.count();
 
         for (let j = 0; j < classCount; j++) {
-            await page.waitForTimeout(500);
             const classCard = classCards.nth(j);
             const classInfo = classCard.locator("[data-testid='class-info']");
             const availabilityInfo = classCard.locator("[data-testid='availability-text']");
@@ -84,7 +79,12 @@ test('Open MakeMyTrip', async () => {
     console.log(trainData);
     await browser.close();
 
-    const htmlContent = generateHTMLTable(trainData);
+    // Update the HTML generation call
+
+    const htmlContent = generateHTMLTable(trainData, 
+        fromCity, 
+        toCity, 
+        formattedDate);
     fs.writeFileSync('train_details.html', htmlContent);
     console.log('Train details saved in train_details.html');
 });

@@ -33,10 +33,9 @@ export async function selectStation(page: Page, label: string, stationCode: stri
 
 // Function to get From/To city name
 export async function grabCity(page: Page, cityId: string, cityType: string) {
-    // Wait for the input field to be visible
     const citySelector = page.locator(`//input[@id='${cityId}']`);
     await expect(citySelector).toBeVisible({ timeout: 50000 });
-    // Get input value
     const cityText = await citySelector.inputValue();
-    console.log(`${cityType}: ${cityText}`); // Logs the city name dynamically
+    console.log(`${cityType}: ${cityText}`);
+    return cityText; // Add this return statement
 }
