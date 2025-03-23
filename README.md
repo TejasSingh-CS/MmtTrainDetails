@@ -1,7 +1,32 @@
-﻿# MmtTrainDetails
+﻿# MakeMyTrip Train Schedule Scraper
 
-Inside that directory, you can run several commands:
+Automated tool to fetch and display train schedules from MakeMyTrip.com
 
+## Features
+- Scrapes train schedules between two stations
+- Displays class availability information
+- Generates formatted HTML reports
+- Uses hardcoded credentials for consistency
+- Built with Playwright for reliable browser automation
+
+## Installation
+```bash
+git clone https://github.com/your-username/makemytrip-train-scraper.git
+cd makemytrip-train-scraper
+npm install
+```
+
+## Use this command to run
+npx playwright test --headed
+
+Output
+- Generates train_details.html with:
+- Train schedule information
+- Class availability status
+- Formatted table layout
+![image](https://github.com/user-attachments/assets/d337859f-bf0d-48e7-896b-571a10cbb14d)
+
+## Usage Cmd
   npx playwright test
     Runs the end-to-end tests.
 
@@ -31,8 +56,6 @@ We suggest that you begin by typing:
     npx playwright test orangehrm.spec.ts --ui
 
     npx playwright test mmt_train.spec.ts --headed
-![image](https://github.com/user-attachments/assets/d337859f-bf0d-48e7-896b-571a10cbb14d)
-
 
     Task
 
