@@ -38,6 +38,7 @@ export default defineConfig({
     {
       name: 'chromium',
       use: {
+        headless: true, // Forces headless mode
         ...devices['Desktop Chrome'],
         //viewport: {width:1500, height:720 },
         //screenshot: 'on',

@@ -1,5 +1,6 @@
 import { test, chromium, expect } from '@playwright/test';
 import fs from 'fs';
+const path = require('path');
 import { Page } from '@playwright/test';
 import { generateHTMLTable, TrainDetails, ClassDetails } from '../utils/htmlUtils'
 import { selectTravelDate, selectStation, grabCity } from '../utils/trainUtils';
@@ -86,5 +87,8 @@ test('Open MakeMyTrip', async () => {
         toCity, 
         formattedDate);
     fs.writeFileSync('train_details.html', htmlContent);
-    console.log('Train details saved in train_details.html');
+    // Get the absolute path dynamically
+const filePath = path.join(__dirname, 'train_details.html');
+
+console.log(`Train details saved in ${filePath}`);
 });
